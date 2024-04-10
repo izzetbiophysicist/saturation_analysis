@@ -3,7 +3,7 @@
 ### heatmap of the saturation mutagenesis
 ######################################################
 
-setwd("/data/Dropbox/mauricio-no-share/Alunos_projetos/colaboracao_zilton_lucas/heatmap/")
+setwd("~/artemis/figura_paper/")
 
 # Install and load required packages
 library(tidyverse)
@@ -11,9 +11,9 @@ library(readr)
 library(colorspace)
 library(plotly)
 
-output <- "/data/Dropbox/mauricio-no-share/Alunos_projetos/colaboracao_zilton_lucas/heatmap/heat_map.png"
+output <- "heat_map.png"
 #input <- "~/artemis/structure/rhapsody_saturation/rhapsody-predictions.txt"
-input <- "/data/Dropbox/mauricio-no-share/Alunos_projetos/colaboracao_zilton_lucas/heatmap/artemis_alphamiss.tsv"
+input <- "artemis_alphamiss.tsv"
 
 pred.input <- read.table(input, sep='\t')
 pred.input$V2 <- as.character(pred.input$V2)
@@ -91,7 +91,15 @@ ggsave(p, filename=output, height=6, width=12, units="in", dpi=200)
 ###################################################################################################3
 # insert clinical data into heatmap
 ###################################################################################################3
-mut.clinvar <- read.table('clinical')
+
+mut.clinvar <- read.csv('clinvar_result.txt',sep='\t')
+mut.clinvar <- mut.clinvar[which(mut.clinvar$Germline.classification %in% c('Pathogenic', 'Likely pathogenic')),]
+clinical <- c()
+for(entry in 1:nrow(mut.clinvar)){
+  clinical <- c(clinical, strsplit(mut.clinvar$Protein.change[entry],split=', ')[[1]])
+}
+
+clinical <- data.frame(V1=clinical)
 
 read_clinical <- function(data){
   data$V1 <- as.character(data$V1)
@@ -102,7 +110,8 @@ read_clinical <- function(data){
   }
 out <- tmp
 }
-am.mut.clinvar <- read_clinical(mut.clinvar)
+
+am.mut.clinvar <- read_clinical(clinical)
 ###################################################################################################3
 # plot com as mutações destacadas
 
@@ -111,6 +120,8 @@ p <- p + geom_point(data = am.mut.clinvar, aes(fill=score), shape = 22, alpha = 
 ggsave(p, filename=output, height=6, width=12, units="in", dpi=200)
 # cor igual para localizar mais facilmente
 p <- p + geom_point(data = am.mut.clinvar, fill='green', shape = 22, alpha = 1, color='gray7', size=2)
+ggsave(p, filename=output, height=6, width=12, units="in", dpi=200)
+
 ggsave(p, filename=output, height=6, width=12, units="in", dpi=200)
 
 
