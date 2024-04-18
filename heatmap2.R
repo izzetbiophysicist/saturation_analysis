@@ -96,7 +96,8 @@ mut.clinvar <- read.csv('clinvar_result.txt',sep='\t')
 mut.clinvar <- mut.clinvar[which(mut.clinvar$Germline.classification %in% c('Pathogenic', 'Likely pathogenic')),]
 clinical <- c()
 for(entry in 1:nrow(mut.clinvar)){
-  clinical <- c(clinical, strsplit(mut.clinvar$Protein.change[entry],split=', ')[[1]])
+  ## Pegando o primeiro elemento da lista de mutacoes, vem apenas a canonica
+  clinical <- c(clinical, strsplit(mut.clinvar$Protein.change[entry],split=', ')[[1]][1])
 }
 
 clinical <- data.frame(V1=clinical)
